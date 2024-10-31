@@ -32,14 +32,23 @@ public interface ProductMapper {
     @Mapping(target = "categories", source = "categories", qualifiedByName = "toCategoryListDto")
     ProductEntry toProductEntry(Product product);
 
+    @Mapping(target = "name", source = "name")
+    @Mapping(target = "description", source = "description")
+    @Mapping(target = "amount", source = "amount")
+    @Mapping(target = "unit", source = "unit", qualifiedByName = "stringToUnit")
+    @Mapping(target = "price", source = "price")
+    @Mapping(target = "categories", source = "categories", qualifiedByName = "toCategoryList")
+    Product toProduct(ProductDto productDto);
+
     @Mapping(target = "id", source = "id")
     @Mapping(target = "name", source = "name")
     @Mapping(target = "description", source = "description")
     @Mapping(target = "amount", source = "amount")
     @Mapping(target = "unit", source = "unit", qualifiedByName = "stringToUnit")
     @Mapping(target = "price", source = "price")
-    @Mapping(target = "categories", source = "categories", qualifiedByName = "toCategoryListEntity")
-    Product toProduct(ProductDto productDto);
+    @Mapping(target = "categories", source = "categories", qualifiedByName = "toCategoryList")
+    Product toProduct(ProductEntry productEntry);
+
 
     @Named("unitToString")
     default String stringToUnit(Unit unit) {

@@ -20,10 +20,22 @@ public interface CategoryMapper {
     @Mapping(target = "name", source = "name")
     CategoryEntry toCategoryEntry(Category category);
 
+    @Mapping(target = "id", source = "id")
+    @Mapping(target = "name", source = "name")
+    Category toCategory(CategoryEntry categoryEntry);
+
     List<CategoryEntry> toCategoryEntry(List<Category> categories);
+
+    @Named("toCategoryList")
+    default List<Category> toCetagoryList(CategoryEntryListDto categoryEntryListDto) {
+        return categoryEntryListDto.getCategoryEntries().stream().map(this::toCategory).toList();
+    }
+
 
     @Named("toCategoryListDto")
     default CategoryEntryListDto toCategoryListDto(List<Category> categories) {
         return CategoryEntryListDto.builder().categoryEntries(toCategoryEntry(categories)).build();
     }
+
+
 }
