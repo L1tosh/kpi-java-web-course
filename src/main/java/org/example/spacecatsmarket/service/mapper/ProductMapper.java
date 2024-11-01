@@ -2,9 +2,9 @@ package org.example.spacecatsmarket.service.mapper;
 
 import org.example.spacecatsmarket.common.Unit;
 import org.example.spacecatsmarket.domain.Product;
-import org.example.spacecatsmarket.dto.ProductDto;
-import org.example.spacecatsmarket.dto.ProductEntry;
-import org.example.spacecatsmarket.dto.ProductListDto;
+import org.example.spacecatsmarket.dto.product.ProductDto;
+import org.example.spacecatsmarket.dto.product.ProductEntry;
+import org.example.spacecatsmarket.dto.product.ProductListDto;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.Named;

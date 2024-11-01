@@ -1,9 +1,9 @@
 package org.example.spacecatsmarket.service.mapper;
 
 import org.example.spacecatsmarket.domain.Category;
-import org.example.spacecatsmarket.dto.CategoryDto;
-import org.example.spacecatsmarket.dto.CategoryEntry;
-import org.example.spacecatsmarket.dto.CategoryEntryListDto;
+import org.example.spacecatsmarket.dto.category.CategoryDto;
+import org.example.spacecatsmarket.dto.category.CategoryEntry;
+import org.example.spacecatsmarket.dto.category.CategoryEntryListDto;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.Named;

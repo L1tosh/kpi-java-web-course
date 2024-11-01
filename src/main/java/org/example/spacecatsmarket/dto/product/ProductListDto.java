@@ -1,4 +1,4 @@
-package org.example.spacecatsmarket.dto;
+package org.example.spacecatsmarket.dto.product;
 
 import lombok.Builder;
 import lombok.Value;

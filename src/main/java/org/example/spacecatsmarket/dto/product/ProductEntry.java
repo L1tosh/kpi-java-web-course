@@ -1,8 +1,9 @@
-package org.example.spacecatsmarket.dto;
+package org.example.spacecatsmarket.dto.product;
 
 import lombok.Builder;
 import lombok.Value;
 import lombok.extern.jackson.Jacksonized;
+import org.example.spacecatsmarket.dto.category.CategoryEntryListDto;
 
 @Value
 @Builder

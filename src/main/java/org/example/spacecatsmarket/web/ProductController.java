@@ -2,9 +2,9 @@ package org.example.spacecatsmarket.web;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.example.spacecatsmarket.dto.ProductDto;
-import org.example.spacecatsmarket.dto.ProductEntry;
-import org.example.spacecatsmarket.dto.ProductListDto;
+import org.example.spacecatsmarket.dto.product.ProductDto;
+import org.example.spacecatsmarket.dto.product.ProductEntry;
+import org.example.spacecatsmarket.dto.product.ProductListDto;
 import org.example.spacecatsmarket.service.ProductService;
 import org.example.spacecatsmarket.service.mapper.ProductMapper;
 import org.springframework.http.HttpStatus;

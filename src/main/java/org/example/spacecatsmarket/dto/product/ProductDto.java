@@ -1,4 +1,4 @@
-package org.example.spacecatsmarket.dto;
+package org.example.spacecatsmarket.dto.product;
 
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
@@ -7,6 +7,7 @@ import jakarta.validation.constraints.Size;
 import lombok.Builder;
 import lombok.Value;
 import lombok.extern.jackson.Jacksonized;
+import org.example.spacecatsmarket.dto.category.CategoryEntryListDto;
 import org.example.spacecatsmarket.dto.validation.CosmicWordCheck;
 
 @Value
