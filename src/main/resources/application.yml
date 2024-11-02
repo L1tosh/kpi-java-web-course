@@ -1,3 +1,4 @@
 spring:
-  application:
-    name: space-cats-market
+    application:
+        name: space-cats-market
+
