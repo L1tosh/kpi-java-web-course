@@ -3,10 +3,9 @@ package org.example.spacecatsmarket.service.impl;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.example.spacecatsmarket.common.Unit;
-import org.example.spacecatsmarket.domain.Category;
 import org.example.spacecatsmarket.domain.Product;
-import org.example.spacecatsmarket.service.CategoryService;
 import org.example.spacecatsmarket.service.ProductService;
+import org.example.spacecatsmarket.service.exception.ProductCreatedException;
 import org.example.spacecatsmarket.service.exception.ProductNotFoundException;
 import org.springframework.stereotype.Service;
 
@@ -19,8 +18,6 @@ import java.util.Optional;
 @Slf4j
 @RequiredArgsConstructor
 public class ProductServiceImpl implements ProductService {
-
-    private final CategoryService categoryService;
     private final List<Product> products = buildAllProductsMock();
 
     @Override
@@ -38,15 +35,21 @@ public class ProductServiceImpl implements ProductService {
 
     @Override
     public Product createProduct(Product product) {
-        if (product.getCategories() != null) {
-            product.getCategories().forEach(category ->
-                    categoryService.getCategoryById(category.getId())
-            );
+        boolean productExists = products.stream()
+                .anyMatch(existingProduct -> existingProduct.getName().equals(product.getName()) &&
+                        existingProduct.getDescription().equals(product.getDescription()));
+
+        if (productExists) {
+            log.info("Product with name {} and description {} already exists", product.getName(), product.getDescription());
+            throw new ProductCreatedException(product.getName(), product.getDescription());
         }
 
-        long newId = products.stream().mapToLong(Product::getId).max().orElse(0) + 1;
-        product.setId(newId);
+        long newId = products.stream()
+                .mapToLong(Product::getId)
+                .max()
+                .orElse(0) + 1;
 
+        product.setId(newId);
         products.add(product);
 
         log.info("Product with id {} created", newId);
@@ -57,16 +60,9 @@ public class ProductServiceImpl implements ProductService {
     public Product updateProduct(Long id, Product updatedProduct) {
         Product existingProduct = getProductById(id);
 
-        if (updatedProduct.getCategories() != null) {
-            updatedProduct.getCategories().forEach(category ->
-                    categoryService.getCategoryById(category.getId())
-            );
-        }
-
         existingProduct.setName(updatedProduct.getName());
         existingProduct.setDescription(updatedProduct.getDescription());
         existingProduct.setPrice(updatedProduct.getPrice());
-        existingProduct.setCategories(updatedProduct.getCategories());
         existingProduct.setAmount(updatedProduct.getAmount());
         existingProduct.setUnit(updatedProduct.getUnit());
 
@@ -75,32 +71,25 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
-    public Product deleteProduct(Long id) {
-        Product productToDelete = getProductById(id);
-        products.remove(productToDelete);
+    public void deleteProduct(Long id) {
+        try {
+            Product productToDelete = getProductById(id);
 
-        log.info("Product with id {} deleted", id);
-        return productToDelete;
+            products.remove(productToDelete);
+            log.info("Product with id {} deleted", id);
+        } catch (ProductNotFoundException ex) {
+            log.info("attempt to delete a product with an ID {} that does not exist", id);
+        }
     }
 
     private List<Product> buildAllProductsMock() {
-        List<Category> categories = List.of(
-                Category.builder().id(1).name("Crafting Supplies").build(),
-                Category.builder().id(2).name("Zero-Gravity Items").build(),
-                Category.builder().id(3).name("Beverages").build(),
-                Category.builder().id(4).name("Nutritional Supplies").build(),
-                Category.builder().id(5).name("Pet Supplies").build(),
-                Category.builder().id(6).name("Intergalactic Herbs").build()
-        );
-
 
         List<Product> list = new ArrayList<>();
         list.add(Product.builder()
                 .id(1L)
-                .name("Anti-Gravity Yarn")
+                .name("Anti-Gravity Star Yarn")
                 .description("High-tech yarn that defies gravity, perfect for intergalactic crafting.")
                 .price(49.99)
-                .categories(List.of(categories.get(0), categories.get(1))) // Используем категории из списка
                 .amount(500.0)
                 .unit(Unit.METER).build());
 
@@ -109,7 +98,6 @@ public class ProductServiceImpl implements ProductService {
                 .name("Cosmic Milk")
                 .description("Premium milk collected from the stars, rich in cosmic nutrients.")
                 .price(15.75)
-                .categories(List.of(categories.get(2), categories.get(3))) // Используем категории из списка
                 .amount(1.0)
                 .unit(Unit.LITER).build());
 
@@ -118,7 +106,6 @@ public class ProductServiceImpl implements ProductService {
                 .name("Nebula Catnip")
                 .description("Aromatic catnip harvested from the Nebula fields, perfect for space cats.")
                 .price(12.30)
-                .categories(List.of(categories.get(4), categories.get(5))) // Используем категории из списка
                 .amount(100.0)
                 .unit(Unit.GRAM).build());
 

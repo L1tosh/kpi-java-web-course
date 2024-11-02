@@ -19,7 +19,6 @@ public interface ProductMapper {
     @Mapping(target = "amount", source = "amount")
     @Mapping(target = "unit", source = "unit", qualifiedByName = "unitToString")
     @Mapping(target = "price", source = "price")
-    @Mapping(target = "categories", source = "categories", qualifiedByName = "toCategoryListDto")
     ProductDto toProductDto(Product product);
 
 
@@ -29,7 +28,6 @@ public interface ProductMapper {
     @Mapping(target = "amount", source = "amount")
     @Mapping(target = "unit", source = "unit", qualifiedByName = "unitToString")
     @Mapping(target = "price", source = "price")
-    @Mapping(target = "categories", source = "categories", qualifiedByName = "toCategoryListDto")
     ProductEntry toProductEntry(Product product);
 
     @Mapping(target = "name", source = "name")
@@ -37,7 +35,6 @@ public interface ProductMapper {
     @Mapping(target = "amount", source = "amount")
     @Mapping(target = "unit", source = "unit", qualifiedByName = "stringToUnit")
     @Mapping(target = "price", source = "price")
-    @Mapping(target = "categories", source = "categories", qualifiedByName = "toCategoryList")
     Product toProduct(ProductDto productDto);
 
     @Mapping(target = "id", source = "id")
@@ -46,7 +43,6 @@ public interface ProductMapper {
     @Mapping(target = "amount", source = "amount")
     @Mapping(target = "unit", source = "unit", qualifiedByName = "stringToUnit")
     @Mapping(target = "price", source = "price")
-    @Mapping(target = "categories", source = "categories", qualifiedByName = "toCategoryList")
     Product toProduct(ProductEntry productEntry);
 
 

@@ -1,7 +1,6 @@
 package org.example.spacecatsmarket.web;
 
 import lombok.extern.slf4j.Slf4j;
-import org.example.spacecatsmarket.service.exception.CategoryNotFoundException;
 import org.example.spacecatsmarket.service.exception.ProductNotFoundException;
 import org.example.spacecatsmarket.web.exception.ErrorDetail;
 import org.springframework.http.HttpHeaders;
@@ -33,20 +32,6 @@ public class ExceptionTranslator extends ResponseEntityExceptionHandler {
                 .build();
 
         log.info("Product Not Found exception raised");
-        return ResponseEntity.status(NOT_FOUND).body(errorDetail);
-    }
-
-    @ExceptionHandler({CategoryNotFoundException.class})
-    ResponseEntity<Object> handleProductNotFoundException(CategoryNotFoundException ex, WebRequest request) {
-
-        var errorDetail = ErrorDetail.builder()
-                .error("Category Not Found")
-                .status(NOT_FOUND.value())
-                .message(ex.getMessage())
-                .path(request.getDescription(false).replace("uri=", ""))
-                .build();
-
-        log.info("Category Not Found exception raised");
         return ResponseEntity.status(NOT_FOUND).body(errorDetail);
     }
 

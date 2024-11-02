@@ -7,7 +7,6 @@ import jakarta.validation.constraints.Size;
 import lombok.Builder;
 import lombok.Value;
 import lombok.extern.jackson.Jacksonized;
-import org.example.spacecatsmarket.dto.category.CategoryEntryListDto;
 import org.example.spacecatsmarket.dto.validation.CosmicWordCheck;
 
 @Value
@@ -31,7 +30,4 @@ public class ProductDto {
 
     @Min(value = 0, message = "Price should be more than 0")
     Double price;
-
-    @NotNull(message = "Product must have at least one category")
-    CategoryEntryListDto categories;
 }

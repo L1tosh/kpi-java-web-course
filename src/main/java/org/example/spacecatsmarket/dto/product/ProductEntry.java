@@ -3,7 +3,6 @@ package org.example.spacecatsmarket.dto.product;
 import lombok.Builder;
 import lombok.Value;
 import lombok.extern.jackson.Jacksonized;
-import org.example.spacecatsmarket.dto.category.CategoryEntryListDto;
 
 @Value
 @Builder
@@ -15,5 +14,4 @@ public class ProductEntry {
     Double amount;
     String unit;
     Double price;
-    CategoryEntryListDto categories;
 }

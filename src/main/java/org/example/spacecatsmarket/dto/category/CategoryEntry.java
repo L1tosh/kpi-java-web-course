@@ -8,6 +8,6 @@ import lombok.extern.jackson.Jacksonized;
 @Builder
 @Jacksonized
 public class CategoryEntry {
-    Long id;
+    Integer id;
     String name;
 }
