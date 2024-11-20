@@ -2,3 +2,10 @@ spring:
     application:
         name: space-cats-market
 
+application:
+    feature:
+        toggles:
+            cosmoCats:
+                enabled: false
+            kittyProducts:
+                enabled: false
