@@ -103,10 +103,12 @@ class ProductServiceImplTest extends AbstractIt {
 
     @Test
     void updateProduct_nonExistingId_shouldThrowException() {
-        ProductNotFoundException exception = assertThrows(ProductNotFoundException.class,
-                () -> productService.updateProduct(productEntity.getId() + 3, productMapper.toProduct(productEntity)));
+        var id = productEntity.getId() + 3;
 
-        assertEquals("Product with the given ID not found", exception.getMessage());
+        ProductNotFoundException exception = assertThrows(ProductNotFoundException.class,
+                () -> productService.updateProduct(id, productMapper.toProduct(productEntity)));
+
+        assertEquals("Product with id %d not found".formatted(id), exception.getMessage());
     }
 
     @Test
@@ -123,9 +125,8 @@ class ProductServiceImplTest extends AbstractIt {
     void deleteProduct_nonExistingProduct_shouldLogInfo() {
         try {
             productService.deleteProduct(productEntity.getId() + 3);
-            fail("Attempt to delete a non-existing product should not throw an exception.");
         } catch (Exception exception) {
-            assertInstanceOf(PersistenceException.class, exception, "Expected PersistenceException");
+            fail("Attempt to delete a non-existing product should not throw an exception.");
         }
     }
 

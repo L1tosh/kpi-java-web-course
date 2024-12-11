@@ -20,6 +20,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.SpyBean;
 import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
+import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 
@@ -33,15 +34,22 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @Import(MappersTestConfiguration.class)
 class ProductControllerIT extends AbstractIt {
 
-    @Autowired private MockMvc mockMvc;
+    @Autowired
+    private MockMvc mockMvc;
 
-    @SpyBean private ProductService productService;
+    @SpyBean
+    private ProductService productService;
 
-    @Autowired private ObjectMapper objectMapper;
-    @Autowired private ProductMapper productMapper;
+    @Autowired
+    private ObjectMapper objectMapper;
 
-    @Autowired private ProductRepository productRepository;
-    @Autowired private CategoryRepository categoryRepository;
+    @Autowired
+    private ProductMapper productMapper;
+
+    @Autowired
+    private ProductRepository productRepository;
+    @Autowired
+    private CategoryRepository categoryRepository;
 
     private ProductEntity product;
 
@@ -53,43 +61,29 @@ class ProductControllerIT extends AbstractIt {
     }
 
     @Test
+    @WithMockUser
     void getProductById_shouldReturnProduct() throws Exception {
         saveProduct();
 
-        mockMvc.perform(MockMvcRequestBuilders.get("/api/v1/products/{id}", product.getId()))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.name").exists())
-                .andExpect(jsonPath("$.name").value(product.getName()))
-                .andExpect(jsonPath("$.description").exists())
-                .andExpect(jsonPath("$.description").value(product.getDescription()))
-                .andExpect(jsonPath("$.amount").exists())
-                .andExpect(jsonPath("$.amount").value(product.getAmount()))
-                .andExpect(jsonPath("$.unit").exists())
-                .andExpect(jsonPath("$.unit").value(product.getUnit()));
+        mockMvc.perform(MockMvcRequestBuilders.get("/api/v1/products/{id}", product.getId())).andExpect(status().isOk()).andExpect(jsonPath("$.name").exists()).andExpect(jsonPath("$.name").value(product.getName())).andExpect(jsonPath("$.description").exists()).andExpect(jsonPath("$.description").value(product.getDescription())).andExpect(jsonPath("$.amount").exists()).andExpect(jsonPath("$.amount").value(product.getAmount())).andExpect(jsonPath("$.unit").exists()).andExpect(jsonPath("$.unit").value(product.getUnit()));
     }
 
     @Test
+    @WithMockUser
     void getAllProducts_shouldReturnProductList() throws Exception {
         saveProduct();
 
-        mockMvc.perform(MockMvcRequestBuilders.get("/api/v1/products"))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.productEntries").isArray())
-                .andExpect(jsonPath("$.productEntries[0].name").exists())
-                .andExpect(jsonPath("$.productEntries[0].name").value(product.getName()))
-                .andExpect(jsonPath("$.productEntries[0].description").value(product.getDescription()))
-                .andExpect(jsonPath("$.productEntries[0].amount").value(product.getAmount()))
-                .andExpect(jsonPath("$.productEntries[0].price").value(product.getPrice()))
-                .andExpect(jsonPath("$.productEntries[0].unit").value(product.getUnit()));
+        mockMvc.perform(MockMvcRequestBuilders.get("/api/v1/products")).andExpect(status().isOk()).andExpect(jsonPath("$.productEntries").isArray()).andExpect(jsonPath("$.productEntries[0].name").exists()).andExpect(jsonPath("$.productEntries[0].name").value(product.getName())).andExpect(jsonPath("$.productEntries[0].description").value(product.getDescription())).andExpect(jsonPath("$.productEntries[0].amount").value(product.getAmount())).andExpect(jsonPath("$.productEntries[0].price").value(product.getPrice())).andExpect(jsonPath("$.productEntries[0].unit").value(product.getUnit()));
     }
 
     @Test
+    @WithMockUser
     void createProduct_ShouldReturnCreatedProduct() throws Exception {
         var productDto = buildProductDto();
 
         mockMvc.perform(MockMvcRequestBuilders.post("/api/v1/products")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(productDto)))
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(productDto)))
                 .andExpect(status().isCreated())
                 .andExpect(jsonPath("$.name").value(productDto.getName()))
                 .andExpect(jsonPath("$.description").value(productDto.getDescription()))
@@ -99,13 +93,14 @@ class ProductControllerIT extends AbstractIt {
     }
 
     @Test
+    @WithMockUser
     void updateProduct_shouldReturnUpdatedProduct() throws Exception {
         saveProduct();
         var productDto = buildProductDto();
 
         mockMvc.perform(MockMvcRequestBuilders.put("/api/v1/products/{id}", product.getId())
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(productDto)))
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(productDto)))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.name").value(productDto.getName()))
                 .andExpect(jsonPath("$.description").value(productDto.getDescription()))
@@ -115,6 +110,7 @@ class ProductControllerIT extends AbstractIt {
     }
 
     @Test
+    @WithMockUser
     void deleteProduct_shouldReturnNoContent() throws Exception {
         saveProduct();
 
@@ -138,19 +134,16 @@ class ProductControllerIT extends AbstractIt {
     }
 
     private void saveProduct() {
-        var categoryEntity = CategoryEntity.builder()
-                .name("some category")
+        var categoryEntity = CategoryEntity.builder().name("some category").build();
+        var productEntity = ProductEntity.builder()
+                .id(1L)
+                .name("Sun")
+                .description("Shines well.")
+                .price(15_999_999.99D)
+                .category(categoryEntity)
+                .amount(1)
+                .unit(Unit.UNIT.name())
                 .build();
-        var productEntity =
-                ProductEntity.builder()
-                        .id(1L)
-                        .name("Sun")
-                        .description("Shines well.")
-                        .price(15_999_999.99D)
-                        .category(categoryEntity)
-                        .amount(1)
-                        .unit(Unit.UNIT.name())
-                        .build();
 
         categoryRepository.save(categoryEntity);
         product = productRepository.save(productEntity);
