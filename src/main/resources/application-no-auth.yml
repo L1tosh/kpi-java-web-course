@@ -1,0 +1,4 @@
+auth:
+  claims:
+    id : 123456
+    email: barsik@gmail.com
