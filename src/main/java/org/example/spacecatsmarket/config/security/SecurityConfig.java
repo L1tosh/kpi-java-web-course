@@ -30,7 +30,6 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.POST, "/api/v1/products/{id}").authenticated()
                         .requestMatchers(HttpMethod.DELETE, "/api/v1/products/{id}").authenticated()
                         .requestMatchers(HttpMethod.PUT, "/api/v1/products/{id}").authenticated()
-                        .requestMatchers(antMatcher( "/api/v1/products/**")).permitAll()
                         .requestMatchers(antMatcher("/api/v1/cosmo-cats")).permitAll()
                 )
                 .oauth2Login(withDefaults())
