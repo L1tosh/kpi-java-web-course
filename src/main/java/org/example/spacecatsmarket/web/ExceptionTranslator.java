@@ -1,6 +1,7 @@
 package org.example.spacecatsmarket.web;
 
 import lombok.extern.slf4j.Slf4j;
+import org.example.spacecatsmarket.featuretoggle.exception.FeatureNotAvailableException;
 import org.example.spacecatsmarket.service.exception.ProductNotFoundException;
 import org.example.spacecatsmarket.web.exception.ErrorDetail;
 import org.springframework.http.HttpHeaders;
@@ -14,8 +15,7 @@ import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExcep
 
 import java.util.List;
 
-import static org.springframework.http.HttpStatus.BAD_REQUEST;
-import static org.springframework.http.HttpStatus.NOT_FOUND;
+import static org.springframework.http.HttpStatus.*;
 
 @ControllerAdvice
 @Slf4j
@@ -32,6 +32,19 @@ public class ExceptionTranslator extends ResponseEntityExceptionHandler {
                 .build();
 
         log.info("Product Not Found exception raised");
+        return ResponseEntity.status(NOT_FOUND).body(errorDetail);
+    }
+
+    @ExceptionHandler({FeatureNotAvailableException.class})
+    ResponseEntity<Object> handleFeatureNotAvailableException(FeatureNotAvailableException ex, WebRequest request) {
+        var errorDetail = ErrorDetail.builder()
+                .error("Feature Not Available")
+                .status(NOT_FOUND.value())
+                .message(ex.getMessage())
+                .path(request.getDescription(false).replace("uri=", ""))
+                .build();
+
+        log.info("Feature Not Available exception raised");
         return ResponseEntity.status(NOT_FOUND).body(errorDetail);
     }
 
@@ -55,5 +68,7 @@ public class ExceptionTranslator extends ResponseEntityExceptionHandler {
         log.info("Input params validation failed: {}", message);
         return ResponseEntity.status(BAD_REQUEST).body(errorDetail);
     }
+
+
 
 }
