@@ -1,65 +1,70 @@
 package org.example.spacecatsmarket.service;
 
+import org.example.spacecatsmarket.AbstractIt;
 import org.example.spacecatsmarket.common.Unit;
 import org.example.spacecatsmarket.domain.Product;
-import org.example.spacecatsmarket.service.exception.ProductCreatedException;
+import org.example.spacecatsmarket.repository.CategoryRepository;
+import org.example.spacecatsmarket.repository.ProductRepository;
+import org.example.spacecatsmarket.repository.entity.CategoryEntity;
+import org.example.spacecatsmarket.repository.entity.ProductEntity;
+import org.example.spacecatsmarket.service.exception.PersistenceException;
 import org.example.spacecatsmarket.service.exception.ProductNotFoundException;
-import org.example.spacecatsmarket.service.impl.ProductServiceImpl;
-import org.junit.jupiter.api.MethodOrderer;
-import org.junit.jupiter.api.Order;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.TestMethodOrder;
+import org.example.spacecatsmarket.service.mapper.ProductMapper;
+import org.hibernate.exception.JDBCConnectionException;
+import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.mock.mockito.SpyBean;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.Mockito.when;
 
-@SpringBootTest(classes = {ProductServiceImpl.class})
+@SpringBootTest
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
-class ProductServiceImplTest {
+class ProductServiceImplTest extends AbstractIt {
+
+    @Autowired
+    private ProductMapper productMapper;
+
+    @SpyBean
+    private ProductRepository productRepository;
 
     @Autowired
     private ProductService productService;
+    @Autowired
+    private CategoryRepository categoryRepository;
 
-    private final Long NON_EXISTING_ID = Long.MAX_VALUE;
+    private ProductEntity productEntity;
 
-    private final Product EXISTING_PRODUCT = buildProduct();
-
-    private Product buildProduct() {
-        return Product.builder()
+    @BeforeEach
+    void setUp() {
+        var categoryEntity = CategoryEntity.builder().name("some category").build();
+        categoryRepository.save(categoryEntity);
+        this.productEntity = productRepository.save(ProductEntity.builder()
                 .id(1L)
-                .name("Anti-Gravity Star Yarn")
-                .description("High-tech yarn that defies gravity, perfect for intergalactic crafting.")
-                .price(49.99)
-                .amount(500.0)
-                .unit(Unit.METER).build();
+                .name("Sun")
+                .description("Shines well.")
+                .price(15_999_999.99D)
+                .category(categoryEntity)
+                .amount(1)
+                .unit(Unit.UNIT.name()).build());
     }
 
-    private Product buildNewProduct() {
-        return Product.builder()
-                .name("Start №42")
-                .description("Very beauty. That all...")
-                .price(99.99)
-                .amount(1.0)
-                .unit(Unit.UNIT).build();
+    @AfterEach
+    void cleanUp() {
+        productRepository.deleteAll();
+        categoryRepository.deleteAll();
     }
 
     @Test
     @Order(1)
     void createProduct_nonExistingProduct_shouldAddAndReturnProduct() {
-        Product newProduct = buildNewProduct();
+        var newProduct = Product.builder().name("cosmo").description("test").unit(Unit.UNIT).price(1D).amount(1.1).build();
 
-        Product createdProduct = productService.createProduct(newProduct);
+        var createdProduct = productService.createProduct(newProduct);
 
         assertNotNull(createdProduct.getId());
         assertEquals(newProduct.getName(), createdProduct.getName());
-    }
-
-    @Test
-    @Order(2)
-    void createProduct_existingProduct_shouldThrowException() {
-        assertThrows(ProductCreatedException.class,
-                () -> productService.createProduct(EXISTING_PRODUCT));
     }
 
     @Test
@@ -67,60 +72,68 @@ class ProductServiceImplTest {
         var products = productService.getAllProducts();
 
         assertNotNull(products);
-        assertEquals(3, products.size());
+        assertEquals(1, products.size());
     }
 
     @Test
     @Order(3)
     void getProductById_existingId_shouldReturnProduct() {
-        var product = productService.getProductById(EXISTING_PRODUCT.getId());
+        var productById = productService.getProductById(productEntity.getId());
 
-        assertNotNull(product);
-        assertEquals(EXISTING_PRODUCT.getName(), product.getName());
+        assertNotNull(productById);
+        assertEquals(productEntity.getName(), productById.getName());
     }
 
     @Test
     void getProductById_nonExistingId_shouldThrowException() {
-        assertThrows(ProductNotFoundException.class,
-                () -> productService.getProductById(NON_EXISTING_ID));
+        assertThrows(ProductNotFoundException.class, () -> productService.getProductById(productEntity.getId() + 3));
     }
 
     @Test
     void updateProduct_existingId_shouldUpdateAndReturnProduct() {
-        var updatedProduct = buildNewProduct();
 
-        var result = productService.updateProduct(1L, updatedProduct);
+        productEntity.setName(productEntity.getName() + "test");
 
-        assertEquals(updatedProduct.getName(), result.getName());
-        assertEquals(updatedProduct.getDescription(), result.getDescription());
-        assertEquals(updatedProduct.getPrice(), result.getPrice());
+        var result = productService.updateProduct(productEntity.getId(), productMapper.toProduct(productEntity));
+
+        assertEquals(productEntity.getName(), result.getName());
+        assertEquals(productEntity.getDescription(), result.getDescription());
+        assertEquals(productEntity.getPrice(), result.getPrice());
     }
 
     @Test
     void updateProduct_nonExistingId_shouldThrowException() {
-        var updatedProduct = buildNewProduct();
+        ProductNotFoundException exception = assertThrows(ProductNotFoundException.class,
+                () -> productService.updateProduct(productEntity.getId() + 3, productMapper.toProduct(productEntity)));
 
-        assertThrows(ProductNotFoundException.class,
-                () -> productService.updateProduct(NON_EXISTING_ID, updatedProduct));
+        assertEquals("Product with the given ID not found", exception.getMessage());
     }
 
     @Test
     void deleteProduct_existingProduct_shouldRemoveProduct() {
-        Long productId = EXISTING_PRODUCT.getId();
-
-        assertTrue(productService.getAllProducts()
-                .stream()
-                .anyMatch(p -> p.getId().equals(productId)));
+        Long productId = productEntity.getId();
 
         productService.deleteProduct(productId);
 
-        assertFalse(productService.getAllProducts().stream()
-                .anyMatch(p -> p.getId().equals(productId)));
+        assertFalse(productRepository.existsById(productId), "The product has not been removed from the database.");
+
     }
 
     @Test
     void deleteProduct_nonExistingProduct_shouldLogInfo() {
-        assertDoesNotThrow(() -> productService.deleteProduct(NON_EXISTING_ID),
-                "Attempt to delete a non-existing product should not throw an exception.");
+        try {
+            productService.deleteProduct(productEntity.getId() + 3);
+            fail("Attempt to delete a non-existing product should not throw an exception.");
+        } catch (Exception exception) {
+            assertInstanceOf(PersistenceException.class, exception, "Expected PersistenceException");
+        }
+    }
+
+    @Test
+    void shouldThrowPersistenceException() {
+        var product = productMapper.toProduct(productEntity);
+
+        when(productService.createProduct(product)).thenThrow(JDBCConnectionException.class);
+        assertThrows(PersistenceException.class, () -> productService.createProduct(product));
     }
 }

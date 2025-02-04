@@ -2,6 +2,15 @@ spring:
     application:
         name: space-cats-market
 
+    datasource:
+        url: jdbc:postgresql://localhost:5432/galactic_cats
+        username: postgres
+        password: root
+
+    liquibase:
+        change-log: classpath:liquibase/changelog.yaml
+        enabled: true
+
 application:
     feature:
         toggles:

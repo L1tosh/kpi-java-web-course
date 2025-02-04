@@ -1,0 +1,61 @@
+databaseChangeLog:
+  - changeSet:
+      id: lab-3-3
+      author: L1tosh
+      changes:
+        - createTable:
+            tableName: products
+            columns:
+              - column:
+                  name: id
+                  type: BIGINT
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: name
+                  type: VARCHAR(100)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: description
+                  type: VARCHAR(500)
+                  constraints:
+                    nullable: true
+              - column:
+                  name: price
+                  type: DOUBLE PRECISION
+                  constraints:
+                    nullable: false
+              - column:
+                  name: amount
+                  type: INT
+                  constraints:
+                    nullable: false
+              - column:
+                  name: unit
+                  type: VARCHAR(50)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: category_id
+                  type: TINYINT
+                  constraints:
+                    nullable: true
+
+        - addForeignKeyConstraint:
+            baseTableName: products
+            baseColumnNames: category_id
+            referencedTableName: categories
+            referencedColumnNames: id
+            constraintName: fk_product_category
+
+        - addUniqueConstraint:
+            tableName: products
+            columnNames: name, category_id
+            constraintName: uq_product_name_in_category
+
+        # Create sequence for Product ID
+        - createSequence:
+            sequenceName: product_id_seq
+            incrementBy: 1
