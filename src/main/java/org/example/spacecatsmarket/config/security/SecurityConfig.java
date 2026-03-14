@@ -27,6 +27,9 @@ public class SecurityConfig {
                 .csrf(CsrfConfigurer::disable)
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(authorize -> authorize
+                        .requestMatchers(HttpMethod.GET, "/api/v1/products").authenticated()
+                        .requestMatchers(HttpMethod.GET, "/api/v1/products/{id}").authenticated()
+                        .requestMatchers(HttpMethod.POST, "/api/v1/products").authenticated()
                         .requestMatchers(HttpMethod.POST, "/api/v1/products/{id}").authenticated()
                         .requestMatchers(HttpMethod.DELETE, "/api/v1/products/{id}").authenticated()
                         .requestMatchers(HttpMethod.PUT, "/api/v1/products/{id}").authenticated()
@@ -43,6 +46,7 @@ public class SecurityConfig {
     public SecurityFilterChain filterChainGreetingV1(HttpSecurity http) throws Exception {
         http
                 .authorizeHttpRequests(authorize -> authorize
+                        .requestMatchers("/health").permitAll()
                         .requestMatchers("/login/**").permitAll()
                         .requestMatchers("/api/v1/**").authenticated()
                 )

@@ -1,6 +1,8 @@
 spring:
     application:
         name: space-cats-market
+    lifecycle:
+        timeout-per-shutdown-phase: 30s
 
     profiles:
         active: local
@@ -26,9 +28,13 @@ spring:
                         user-info-uri: https://api.github.com/user
 
     datasource:
-        url: jdbc:postgresql://localhost:5432/galactic_cats
-        username: postgres
-        password: root
+        url: jdbc:postgresql://${DB_HOST:localhost}:${DB_PORT:5432}/${DB_NAME:galactic_cats}
+        username: ${DB_USER:postgres}
+        password: ${DB_PASSWORD:root}
+        hikari:
+            connection-timeout: 2000
+            validation-timeout: 1000
+            maximum-pool-size: 10
 
     liquibase:
         change-log: classpath:liquibase/changelog.yaml
@@ -41,3 +47,6 @@ application:
                 enabled: false
             kittyProducts:
                 enabled: false
+
+server:
+    shutdown: graceful
