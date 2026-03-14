@@ -1,0 +1,42 @@
+databaseChangeLog:
+  - changeSet:
+      id: lab-3-1
+      author: L1tosh
+      changes:
+
+        # Create Customer table
+        - createTable:
+            tableName: customers
+            columns:
+              - column:
+                  name: id
+                  type: BIGINT
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: name
+                  type: VARCHAR(255)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: email
+                  type: VARCHAR(255)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: address
+                  type: VARCHAR(255)
+                  constraints:
+                    nullable: true
+
+        # Add unique constraints on email
+        - addUniqueConstraint:
+            tableName: customers
+            columnNames: email
+            constraintName: uq_customer_email
+
+        # Create sequence for Customer ID
+        - createSequence:
+            sequenceName: customer_id_seq
+            incrementBy: 1

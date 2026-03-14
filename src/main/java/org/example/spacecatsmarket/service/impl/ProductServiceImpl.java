@@ -2,113 +2,79 @@ package org.example.spacecatsmarket.service.impl;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.example.spacecatsmarket.common.Unit;
 import org.example.spacecatsmarket.domain.Product;
+import org.example.spacecatsmarket.repository.ProductRepository;
+import org.example.spacecatsmarket.repository.entity.ProductEntity;
 import org.example.spacecatsmarket.service.ProductService;
-import org.example.spacecatsmarket.service.exception.ProductCreatedException;
+import org.example.spacecatsmarket.service.exception.PersistenceException;
 import org.example.spacecatsmarket.service.exception.ProductNotFoundException;
+import org.example.spacecatsmarket.service.mapper.ProductMapper;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 
 
 @Service
 @Slf4j
 @RequiredArgsConstructor
 public class ProductServiceImpl implements ProductService {
-    private final List<Product> products = buildAllProductsMock();
+
+    private final ProductRepository productRepository;
+    private final ProductMapper productMapper;
 
     @Override
+    @Transactional(readOnly = true)
     public List<Product> getAllProducts() {
-        return products;
+        return productMapper.toProductList((List<ProductEntity>) productRepository.findAll());
     }
 
     @Override
+    @Transactional(readOnly = true)
     public Product getProductById(Long productId) {
-        return Optional.of(products.stream().filter(product -> product.getId().equals(productId)).findFirst()).get().orElseThrow(() -> {
-            log.info("Product with id {} not found in mock", productId);
+        var productEntity = productRepository.findById(productId).orElseThrow(() -> {
+            log.info("Product with id {} not found", productId);
             return new ProductNotFoundException(productId);
         });
+
+        return productMapper.toProduct(productEntity);
     }
 
     @Override
+    @Transactional(propagation = Propagation.NESTED)
     public Product createProduct(Product product) {
-        boolean productExists = products.stream()
-                .anyMatch(existingProduct -> existingProduct.getName().equals(product.getName()) &&
-                        existingProduct.getDescription().equals(product.getDescription()));
-
-        if (productExists) {
-            log.info("Product with name {} and description {} already exists", product.getName(), product.getDescription());
-            throw new ProductCreatedException(product.getName(), product.getDescription());
-        }
-
-        long newId = products.stream()
-                .mapToLong(Product::getId)
-                .max()
-                .orElse(0) + 1;
-
-        product.setId(newId);
-        products.add(product);
-
-        log.info("Product with id {} created", newId);
-        return product;
-    }
-
-    @Override
-    public Product updateProduct(Long id, Product updatedProduct) {
-        Product existingProduct = getProductById(id);
-
-        existingProduct.setName(updatedProduct.getName());
-        existingProduct.setDescription(updatedProduct.getDescription());
-        existingProduct.setPrice(updatedProduct.getPrice());
-        existingProduct.setAmount(updatedProduct.getAmount());
-        existingProduct.setUnit(updatedProduct.getUnit());
-
-        log.info("Product with id {} updated", id);
-        return existingProduct;
-    }
-
-    @Override
-    public void deleteProduct(Long id) {
         try {
-            Product productToDelete = getProductById(id);
-
-            products.remove(productToDelete);
-            log.info("Product with id {} deleted", id);
-        } catch (ProductNotFoundException ex) {
-            log.info("attempt to delete a product with an ID {} that does not exist", id);
+            var savedProduct = productRepository.save(productMapper.toProductEntity(product));
+            return productMapper.toProduct(savedProduct);
+        } catch (Exception ex) {
+            log.error("Exception occurred while saving customer details");
+            throw new PersistenceException(ex);
         }
     }
 
-    private List<Product> buildAllProductsMock() {
+    @Override
+    @Transactional(propagation = Propagation.NESTED)
+    public Product updateProduct(Long id, Product updatedProduct) {
+        var existingProduct =  productMapper.toProduct(productRepository.findById(id).orElseThrow(() -> {
+            log.info("Product with id {} not found", id);
+            return new ProductNotFoundException(id);
+        }));
 
-        List<Product> list = new ArrayList<>();
-        list.add(Product.builder()
-                .id(1L)
-                .name("Anti-Gravity Star Yarn")
-                .description("High-tech yarn that defies gravity, perfect for intergalactic crafting.")
-                .price(49.99)
-                .amount(500.0)
-                .unit(Unit.METER).build());
+        productMapper.updateProduct(updatedProduct, existingProduct);
+        var savedProductEntity = productRepository.save(productMapper.toProductEntity(existingProduct));
 
-        list.add(Product.builder()
-                .id(2L)
-                .name("Cosmic Milk")
-                .description("Premium milk collected from the stars, rich in cosmic nutrients.")
-                .price(15.75)
-                .amount(1.0)
-                .unit(Unit.LITER).build());
+        return productMapper.toProduct(savedProductEntity);
+    }
 
-        list.add(Product.builder()
-                .id(3L)
-                .name("Nebula Catnip")
-                .description("Aromatic catnip harvested from the Nebula fields, perfect for space cats.")
-                .price(12.30)
-                .amount(100.0)
-                .unit(Unit.GRAM).build());
-
-        return list;
+    @Override
+    @Transactional
+    public void deleteProduct(Long productId) {
+        try {
+            productRepository.deleteById(productId);
+        } catch (Exception ex) {
+            log.error("Exception occurred while deleting customer details with id {}", productId);
+            throw new PersistenceException(ex);
+        }
     }
 }

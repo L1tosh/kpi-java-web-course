@@ -1,6 +1,7 @@
 package org.example.spacecatsmarket.domain;
 
-import lombok.*;
+import lombok.Builder;
+import lombok.Data;
 import org.example.spacecatsmarket.common.OrderStatus;
 
 import java.util.List;
@@ -11,7 +12,6 @@ public class Order {
 
     Long id;
     List<Product> products;
-    Double price;
     OrderStatus status;
 
 }

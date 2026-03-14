@@ -1,0 +1,31 @@
+databaseChangeLog:
+  - changeSet:
+      id: lab-3-2
+      author: L1tosh
+      changes:
+
+        # Create Category table
+        - createTable:
+            tableName: categories
+            columns:
+              - column:
+                  name: id
+                  type: INTEGER
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: name
+                  type: VARCHAR(50)
+                  constraints:
+                    nullable: false
+
+        - addUniqueConstraint:
+            tableName: categories
+            columnNames: name
+            constraintName: uq_category_name
+
+        # Sequence for Category ID
+        - createSequence:
+            sequenceName: category_id_seq
+            incrementBy: 1

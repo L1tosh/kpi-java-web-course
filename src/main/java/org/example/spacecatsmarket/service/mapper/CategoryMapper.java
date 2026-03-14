@@ -4,6 +4,7 @@ import org.example.spacecatsmarket.domain.Category;
 import org.example.spacecatsmarket.dto.category.CategoryDto;
 import org.example.spacecatsmarket.dto.category.CategoryEntry;
 import org.example.spacecatsmarket.dto.category.CategoryListDto;
+import org.example.spacecatsmarket.repository.entity.CategoryEntity;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.Named;
@@ -18,14 +19,25 @@ public interface CategoryMapper {
 
     @Mapping(target = "id", source = "id")
     @Mapping(target = "name", source = "name")
+    @Named("toCategoryEntry")
     CategoryEntry toCategoryEntry(Category category);
 
     @Mapping(target = "id", source = "id")
     @Mapping(target = "name", source = "name")
+    @Named("toCategory")
     Category toCategory(CategoryEntry categoryEntry);
 
     @Mapping(target = "name", source = "name")
     Category toCategory(CategoryDto categoryEntry);
+
+    @Mapping(target = "id", source = "id")
+    @Mapping(target = "name", source = "name")
+    CategoryEntity toCategoryEntity(Category category);
+
+    @Mapping(target = "id", source = "id")
+    @Mapping(target = "name", source = "name")
+    @Named("toCategoryFromCategoryEntity")
+    Category toCategory(CategoryEntity categoryEntity);
 
     List<CategoryEntry> toCategoryEntry(List<Category> categories);
 

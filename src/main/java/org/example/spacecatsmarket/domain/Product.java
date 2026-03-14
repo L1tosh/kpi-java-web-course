@@ -14,4 +14,5 @@ public class Product {
     Double price;
     Double amount;
     Unit unit;
+    Category category;
 }
