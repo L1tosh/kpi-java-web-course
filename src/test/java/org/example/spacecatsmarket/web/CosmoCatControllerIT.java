@@ -1,5 +1,6 @@
 package org.example.spacecatsmarket.web;
 
+import org.example.spacecatsmarket.AbstractIt;
 import org.example.spacecatsmarket.featuretoggle.FeatureToggleExtension;
 import org.example.spacecatsmarket.featuretoggle.annotation.DisabledFeatureToggle;
 import org.example.spacecatsmarket.featuretoggle.annotation.EnabledFeatureToggle;
@@ -22,7 +23,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @SpringBootTest
 @AutoConfigureMockMvc
 @ExtendWith(FeatureToggleExtension.class)
-class CosmoCatControllerIT {
+class CosmoCatControllerIT extends AbstractIt {
 
     @Autowired
     private MockMvc mockMvc;

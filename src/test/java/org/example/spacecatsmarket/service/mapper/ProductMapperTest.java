@@ -1,5 +1,6 @@
 package org.example.spacecatsmarket.service.mapper;
 
+import org.example.spacecatsmarket.AbstractIt;
 import org.example.spacecatsmarket.common.Unit;
 import org.example.spacecatsmarket.config.MappersTestConfiguration;
 import org.example.spacecatsmarket.domain.Product;
@@ -17,7 +18,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @SpringBootTest()
 @Import(MappersTestConfiguration.class)
-class ProductMapperTest {
+class ProductMapperTest extends AbstractIt {
 
     @Autowired
     private ProductMapper productMapper;

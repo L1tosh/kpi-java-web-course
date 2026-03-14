@@ -1,10 +1,14 @@
 package org.example.spacecatsmarket.web;
 
 
+import org.example.spacecatsmarket.AbstractIt;
+import org.example.spacecatsmarket.featuretoggle.FeatureToggleExtension;
 import org.example.spacecatsmarket.featuretoggle.annotation.DisabledFeatureToggle;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
+import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
@@ -17,12 +21,14 @@ import static org.example.spacecatsmarket.featuretoggle.FeatureToggles.COSMO_CAT
 
 @SpringBootTest
 @AutoConfigureMockMvc
-class ExceptionTranslatorTest {
+@ExtendWith(FeatureToggleExtension.class)
+class ExceptionTranslatorTest extends AbstractIt {
 
     @Autowired
     private MockMvc mockMvc;
 
     @Test
+    @WithMockUser
     void handleProductNotFoundException_shouldReturnNotFound() throws Exception {
         mockMvc.perform(get("/api/v1/products/999"))
                 .andExpect(status().isNotFound())
@@ -34,6 +40,7 @@ class ExceptionTranslatorTest {
 
 
     @Test
+    @WithMockUser
     void handleMethodArgumentNotValid_shouldReturnBadRequest() throws Exception {
         String invalidRequest = "{\"name\":\"\"}";
 

@@ -1,5 +1,6 @@
 package org.example.spacecatsmarket.service.mapper;
 
+import org.example.spacecatsmarket.AbstractIt;
 import org.example.spacecatsmarket.config.MappersTestConfiguration;
 import org.example.spacecatsmarket.domain.Category;
 import org.example.spacecatsmarket.dto.category.CategoryDto;
@@ -16,7 +17,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @SpringBootTest
 @Import(MappersTestConfiguration.class)
-class CategoryMapperTest {
+class CategoryMapperTest extends AbstractIt {
 
     private final Category CATEGORY = Category.builder().id(1).name("Crafting Supplies").build();
     private final CategoryDto CATEGORY_DTO = CategoryDto.builder().name("Crafting Supplies").build();

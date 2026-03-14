@@ -30,8 +30,7 @@ class CategoryServiceImplTest {
 
     @Test
     void getCategoryById_notExistingCategory_shouldReturnCategory() {
-        assertThrows(CategoryNotFoundException.class,
-                () -> categoryService.getCategoryById(NON_EXISTING_ID));
+        assertThrows(CategoryNotFoundException.class, () -> categoryService.getCategoryById(NON_EXISTING_ID));
     }
 
     @Test
@@ -41,7 +40,4 @@ class CategoryServiceImplTest {
         assertNotNull(categories);
         assertEquals(6, categories.size());
     }
-
-
-
 }
