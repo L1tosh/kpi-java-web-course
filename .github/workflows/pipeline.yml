@@ -48,7 +48,9 @@ jobs:
           vuln-type: 'os,library'
           severity: 'CRITICAL,HIGH'
 
-      - name: Run grading script
+      - name: Run Master Validation Script
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          chmod +x ./grading.sh 
-          ./grading.sh
+          chmod +x ./tests/lab2_test.sh
+          ./tests/lab2_test.sh
