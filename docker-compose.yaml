@@ -1,7 +1,7 @@
 services:
-  postgres:
+  db:
     image: postgres:15-alpine
-    container_name: galactic_cats
+    container_name: db_galactic_cats
     ports:
       - "5432:5432"
     environment:
@@ -18,18 +18,18 @@ services:
 
   app:
     build: .
-    container_name: space-cats-market
+    container_name: app_space-cats-market
     ports:
       - "8080:8080"
     environment:
       SPRING_PROFILES_ACTIVE: no-auth
-      DB_HOST: postgres
+      DB_HOST: db
       DB_PORT: 5432
       DB_NAME: ${DB_NAME:-galactic_cats}
       DB_USER: ${DB_USER:-postgres}
       DB_PASSWORD: ${DB_PASSWORD:-root}
     depends_on:
-      postgres:
+      db:
         condition: service_healthy
 
 volumes:
