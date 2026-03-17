@@ -1,0 +1,10 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: ecommerce-app-config
+  labels:
+    app: ecommerce-app
+data:
+  DB_HOST: space-cats-db
+  DB_NAME: galactic_cats
+  DB_USER: postgres
