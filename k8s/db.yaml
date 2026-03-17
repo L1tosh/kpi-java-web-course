@@ -1,0 +1,59 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: space-cats-db
+  labels:
+    app: space-cats-db
+spec:
+  type: ClusterIP
+  selector:
+    app: space-cats-db
+  ports:
+    - name: postgres
+      port: 5432
+      targetPort: postgres
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: space-cats-db
+  labels:
+    app: space-cats-db
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: space-cats-db
+  template:
+    metadata:
+      labels:
+        app: space-cats-db
+    spec:
+      containers:
+        - name: postgres
+          image: postgres:15-alpine
+          ports:
+            - name: postgres
+              containerPort: 5432
+          env:
+            - name: POSTGRES_DB
+              valueFrom:
+                configMapKeyRef:
+                  name: ecommerce-app-config
+                  key: DB_NAME
+            - name: POSTGRES_USER
+              valueFrom:
+                configMapKeyRef:
+                  name: ecommerce-app-config
+                  key: DB_USER
+            - name: POSTGRES_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: ecommerce-app-secret
+                  key: DB_PASSWORD
+          volumeMounts:
+            - name: data
+              mountPath: /var/lib/postgresql/data
+      volumes:
+        - name: data
+          emptyDir: {}
